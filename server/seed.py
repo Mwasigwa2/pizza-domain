@@ -1,6 +1,5 @@
-from app import app  # Replace with your actual Flask app import
-from app import db  # Make sure to import your configured database instance
-from models import Restaurant, Pizza, RestaurantPizza
+from app import app  
+from models import Restaurant, Pizza, RestaurantPizza, db
 from faker import Faker
 
 fake = Faker()
@@ -32,8 +31,7 @@ def seed_restaurant_pizzas(num_entries=50):
         db.session.add(restaurant_pizza)
 
 if __name__ == "__main__":
-    with app.app_context():  # This line pushes a Flask application context
-        db.drop_all()
+    with app.app_context():
         db.create_all()
 
         seed_restaurants()
