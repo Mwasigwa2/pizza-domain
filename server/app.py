@@ -89,6 +89,12 @@ class Pizzas(Resource):
 api.add_resource(Pizzas, '/pizzas')
 
 class RestaurantPizzas(Resource):
+    def get(self):
+        restaurant_pizzas = RestaurantPizza.query.all()
+        restaurant_pizza_schema = RestaurantPizzaSchema(many=True)
+        serialized_restaurant_pizzas = restaurant_pizza_schema.dump(restaurant_pizzas)
+        return make_response(jsonify(serialized_restaurant_pizzas), 200)
+    
     def post(self):
         data = request.get_json()
         new_restaurant_pizza = RestaurantPizza(
