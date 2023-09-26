@@ -14,11 +14,9 @@ This project is a RESTful API for managing pizza restaurants and their menus. It
     - [Prerequisites](#prerequisites)
     - [Installation](#installation)
   - [Usage](#usage)
-  - [Configuration](#configuration)
-  - [API Documentation](#api-documentation)
   - [Contributing](#contributing)
   - [License](#license)
-  - [Acknowledgments](#acknowledgments)
+  
 
 ## Introduction
 
@@ -48,7 +46,7 @@ Ensure you have the following software installed:
 1. Clone the repository:
 
 ```bash
-        git clone https://github.com/yourusername/pizza-restaurant-api.git
+        git clone https://github.com/Abogeerick/pizza-domain.git
 
  ```
 2. Move into the repository

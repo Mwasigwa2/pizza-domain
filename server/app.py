@@ -3,9 +3,10 @@
 from flask import Flask, jsonify, request, make_response
 from flask_migrate import Migrate
 from flask_restful import Api, Resource
-
 from models import db, Restaurant, RestaurantPizza, Pizza
-from schemas import RestaurantSchema, PizzaSchema, RestaurantPizzaSchema
+from flask_marshmallow import Marshmallow
+from flask_sqlalchemy import SQLAlchemy
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pizza.db'
@@ -16,6 +17,22 @@ migrate = Migrate(app, db)
 db.init_app(app)
 
 api = Api(app)
+ma = Marshmallow(app)
+
+class PizzaSchema(ma.Schema):
+    class Meta:
+        fields = ("id", "name", "ingredients")
+       
+
+class RestaurantSchema(ma.Schema):
+    class Meta:
+        fields = ("id", "name", "address", "pizzas")
+
+    pizzas = ma.Nested(PizzaSchema, many=True)
+
+class RestaurantPizzaSchema(ma.Schema):
+    class Meta:
+        fields = ("id", "price", "restaurant_id", "pizza_id")
 
 class Index(Resource):
 
@@ -36,6 +53,7 @@ class Restaurants(Resource):
         restaurants = Restaurant.query.all()
         restaurant_schema = RestaurantSchema(many=True)
         serialized_restaurants = restaurant_schema.dump(restaurants)
+        print(serialized_restaurants)
         return make_response(jsonify(serialized_restaurants), 200)
 
 api.add_resource(Restaurants, '/restaurants')
@@ -74,9 +92,9 @@ class RestaurantPizzas(Resource):
     def post(self):
         data = request.get_json()
         new_restaurant_pizza = RestaurantPizza(
-            price=data['price'],
-            pizza_id=data['pizza_id'],
-            restaurant_id=data['restaurant_id']
+            price=int(data['price']),
+            pizza_id=int(data['pizza_id']),
+            restaurant_id=int(data['restaurant_id'])
         )
         db.session.add(new_restaurant_pizza)
         db.session.commit()

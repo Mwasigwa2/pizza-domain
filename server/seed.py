@@ -1,43 +1,45 @@
-from app import app  
-from models import Restaurant, Pizza, RestaurantPizza, db
+from flask import Flask
 from faker import Faker
+from random import choice as rc
+from app import app
+from models import db, Restaurant, Pizza, RestaurantPizza
 
 fake = Faker()
 
-def seed_restaurants(num_entries=20):
-    for _ in range(num_entries):
-        restaurant = Restaurant(
-            name=fake.unique.company(),
-            address=fake.address()
-        )
-        db.session.add(restaurant)
-
-def seed_pizzas():
-    pizza_names = ["Margherita", "Pepperoni", "Hawaiian", "BBQ Chicken", "Meat Lover", "Veggie"]
-    for name in pizza_names:
-        pizza = Pizza(
-            name=name,
-            ingredients=fake.sentence()
-        )
-        db.session.add(pizza)
-
-def seed_restaurant_pizzas(num_entries=50):
-    for _ in range(num_entries):
-        restaurant_pizza = RestaurantPizza(
-            price=fake.random_int(min=5, max=30),
-            pizza_id=fake.random_int(min=1, max=6),  
-            restaurant_id=fake.random_int(min=1, max=20)  
-        )
-        db.session.add(restaurant_pizza)
-
-if __name__ == "__main__":
+def seed_data():
     with app.app_context():
+        # Clear existing data
+        db.drop_all()
         db.create_all()
 
-        seed_restaurants()
-        seed_pizzas()
-        seed_restaurant_pizzas()
-
+        # Seed Restaurants
+        restaurants = []
+        for _ in range(5):
+            restaurant = Restaurant(name=fake.company(), address=fake.address())
+            db.session.add(restaurant)
+            restaurants.append(restaurant)
         db.session.commit()
 
-    print("Database seeded!")
+        # Seed Pizzas
+        pizzas = []
+        for flavor in ['Margherita', 'Pepperoni', 'Veggie']:
+            pizza = Pizza(name=flavor, ingredients='Tomato, Cheese')
+            db.session.add(pizza)
+            pizzas.append(pizza)
+        db.session.commit()
+
+        # Seed RestaurantPizza
+        for restaurant in restaurants:
+            for pizza in pizzas:
+                restaurant_pizza = RestaurantPizza(
+                    price=fake.random_int(min=10, max=20),
+                    restaurant=restaurant,
+                    pizza=pizza
+                )
+                db.session.add(restaurant_pizza)
+        db.session.commit()
+
+        print('Database seeded!')
+
+if __name__ == '__main__':
+    seed_data()
